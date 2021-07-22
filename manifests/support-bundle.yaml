@@ -15,6 +15,7 @@ spec:
           - component=sentry
     - run:
         collectorName: ping-google
+        namespace: '{{repl Namespace}}'
         image: flungo/netutils
         command: ["ping"]
         args: ["www.google.com"]
