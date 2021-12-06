@@ -26,6 +26,15 @@ spec:
           type: text
           default: "2"
           required: true
+        - name: foo_button
+          title: On or Off
+          type: select_one
+          default: foo_on
+          items:
+            - name: foo_off
+              title: foo off
+            - name: foo_on
+              title: foo on
     - name: database
       title: Database
       description: Database Options
