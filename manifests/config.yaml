@@ -133,4 +133,9 @@ spec:
     - name: conditional_and
       title: Conditional conditional
       description: only shows up when both redis and postgres are set to embedded_postgres
-      when: repl{{  (and (ConfigOptionEquals "redis_type" "embedded_redis") (ConfigOptionEquals "postgres_type" "embedded_postgres") }}
+      when: repl{{  (and (ConfigOptionEquals "redis_type" "embedded_redis") (ConfigOptionEquals "postgres_type" "embedded_postgres")) }}
+      items:
+        - name: foo
+          title: foo
+          type: text
+          default: "foo"
