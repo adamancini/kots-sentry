@@ -130,3 +130,30 @@ spec:
           type: password
           default: 'password'
           when: repl{{ ConfigOptionEquals "enable_smtp" "1" }}
+    - name: node_affinity
+      title: Node Affinity Configuration
+      description: |
+        Torch Node Affinity Configuration
+      items:
+        - name: enable_node_affinity
+          title: Enable Node Affinity
+          type: bool
+          default: "0"
+        - name: node_affinity
+          title: Node Affinity Config
+          type: textarea
+          props:
+            rows: 15
+          when: repl{{ ConfigOptionEquals "enable_node_affinity" "1" }}
+          required: false
+        - name: enable_node_toleration
+          title: Enable Node Toleration
+          type: bool
+          default: "0"
+        - name: node_toleration
+          title: Node Toleration Config
+          type: textarea
+          props:
+            rows: 15
+          when: repl{{ ConfigOptionEquals "enable_node_toleration" "1" }}
+          required: false
