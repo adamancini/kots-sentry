@@ -15,8 +15,8 @@ spec:
         app: sentry-worker
         component: sentry
     spec:
-      tolerations: repl{{ if ConfigOptionEquals "enable_node_toleration" "1"}} repl{{ print "|" (ConfigOption "node_toleration" | nindent 8}} repl{{else}} [] repl{{end}}
-      affinity: repl{{ if ConfigOptionEquals "enable_node_affinity" "1"}} repl{{ print "|" (ConfigOption "node_affinity" | nindent 8}} repl{{else}} {} repl{{end}}
+      tolerations: repl{{ if ConfigOptionEquals "enable_node_toleration" "1"}} repl{{ print "|" (ConfigOption "node_toleration" | nindent 8) }} repl{{ else }} [] repl{{ end }}
+      affinity: repl{{ if ConfigOptionEquals "enable_node_affinity" "1"}} repl{{ print "|" (ConfigOption "node_affinity" | nindent 8) }} repl{{ else }} {} repl{{ end }}
       containers:
       - name: sentry-workers
         image: "sentry:9.1.1"
