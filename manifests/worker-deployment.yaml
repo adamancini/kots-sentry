@@ -16,10 +16,10 @@ spec:
         component: sentry
     spec:
       tolerations: |
-        '{{repl if ConfigOptionEquals "enable_node_toleration" "1"}} {{repl ConfigOption "torch_services_node_toleration" | nindent 8}} {{repl else}}[]{{repl end}}'
+        '{{repl if ConfigOptionEquals "enable_node_toleration" "1"}} {{repl ConfigOption "node_toleration" | nindent 8}} {{repl else}}[]{{repl end}}'
 
       affinity: |
-        '{{repl if ConfigOptionEquals "enable_node_affinity" "1"}} {{repl ConfigOption "torch_services_node_affinity_config | nindent 8}} {{repl else}}{}{{repl end}}'
+        '{{repl if ConfigOptionEquals "enable_node_affinity" "1"}} {{repl ConfigOption "node_affinity" | nindent 8}} {{repl else}}{}{{repl end}}'
       containers:
       - name: sentry-workers
         image: "sentry:9.1.1"
