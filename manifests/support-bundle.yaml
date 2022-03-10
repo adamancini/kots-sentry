@@ -13,6 +13,13 @@ spec:
         name: sentry/logs
         selector:
           - component=sentry
+    - exec:
+        collectorName: get-app-versions
+        selector:
+          app=kotsadm
+        namespace: '{{repl Namespace}}'
+        command: ["/kots"]
+        args: ["get", "versions", "-n", '{{repl Namespace}}', "sentry-pro"]
     - run:
         collectorName: ping-google
         namespace: '{{repl Namespace}}'
