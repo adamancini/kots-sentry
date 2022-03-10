@@ -19,7 +19,7 @@ spec:
           app=kotsadm
         namespace: '{{repl Namespace}}'
         command: ["/kots"]
-        args: ["get", "versions", "-n", '{{repl Namespace}}', "sentry-pro"]
+        args: ["get", "versions", "-n", '{{repl Namespace}}', "sentry-pro", "-o", "json"]
     - run:
         collectorName: ping-google
         namespace: '{{repl Namespace}}'
