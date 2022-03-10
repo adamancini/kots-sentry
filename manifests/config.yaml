@@ -157,3 +157,16 @@ spec:
             rows: 15
           when: repl{{ ConfigOptionEquals "enable_node_toleration" "1" }}
           required: false
+    - name: certs
+      items:
+        - name: issuer_certs
+          type: textarea
+          value: repl{{$ca := genCA "ingress-ca" 365}}repl{{cat ($ca.Cert | b64enc) ($ca.Key | b64enc)}}
+          hidden: true
+        - name: issuer_cert
+          type: textarea
+          title: Issuer CA certificate
+          help_text: |
+            A self-signed CA has been automatically generated. Replace this with an intermediate CA
+            certificate to tie TLS into your trust infrastructure.
+          default: repl{{(split " " (ConfigOption "issuer_certs"))._0 | b64dec}}
