@@ -20,8 +20,8 @@ spec:
         image: "sentry:9.1.1"
         imagePullPolicy: IfNotPresent
         args:
-          - "run"
-          - "worker"
+        - "run"
+        - "worker"
         ports:
         - containerPort: 9000
         env:
@@ -75,12 +75,12 @@ spec:
         - mountPath: /var/lib/sentry/files
           name: sentry-data
         resources:
-            limits:
-              cpu: 300m
-              memory: 500Mi
-            requests:
-              cpu: 100m
-              memory: 100Mi
+          limits:
+            cpu: 300m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
 
       volumes:
       - name: config

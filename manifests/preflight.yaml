@@ -131,3 +131,25 @@ spec:
               message: Could not find index.docker.io imagePullSecret
           - pass:
               message: Found credentials to pull private images from index.docker.io
+    - postgres:
+        checkName: Future versions of StackBlitz EE will require PostgreSQL version 13 or greater.
+        collectorName: postgresql
+        outcomes:
+          - fail:
+              when: connected == false
+              message: Cannot connect to PostgreSQL server. If you are installing for the first time this is normal.
+          - warn:
+              when: version < 13.x
+              message: >-
+                {{repl if ConfigOptionEquals "postgres_type" "external_postgres_inline"}}
+                  To prepare for the coming release of StackBlitz EE 2.0, Please upgrade your PostgreSQL instance ASAP.
+                {{repl else}}
+                  This release uses a new embedded postgres 13 instance. Your data will be migrated to it automatically. Please allow several minutes after deployment for the migration to complete.
+                {{repl end}}
+          - pass:
+              message: Your Postgres server is already compliant.
+  collectors:
+    - postgres:
+        collectorName: postgresql
+        uri: postgresql://postgres:repl{{ConfigOption "embedded_postgres_password"}}@postgres:5432/postgres?sslmode=disable
+        #uri: repl{{if ConfigOptionEquals "postgres_type" "external_postgres_inline"}}repl{{ConfigOption "external_postgres_connectionstring"}}/postgres?sslmode=requirerepl{{else}}postgresql://postgres:postgres@postgres.repl{{Namespace | ToLower}}.svc.cluster.local/postgres?sslmode=disablerepl{{end}}
