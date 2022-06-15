@@ -6,7 +6,7 @@ spec:
   groups:
     - name: sentry
       title: Sentry
-      description: Sentry Defaults
+      description: Sentry Default Configs
       items:
         - name: admin_username
           title: Admin Username
@@ -16,11 +16,11 @@ spec:
           title: Admin Password
           type: password
           default: 'password'
-        - name: secret_key
-          title: Secret Key
-          type: password
-          hidden: true
-          value: "{{repl RandomString 40}}"
+        # - name: secret_key
+        #   title: Secret Key
+        #   type: password
+        #   hidden: true
+        #   value: "{{repl RandomString 40}}"
         - name: worker_replicas
           title: Worker Replicas
           type: text
@@ -170,3 +170,15 @@ spec:
             A self-signed CA has been automatically generated. Replace this with an intermediate CA
             certificate to tie TLS into your trust infrastructure.
           default: repl{{(split " " (ConfigOption "issuer_certs"))._0 | b64dec}}
+    - name: optional_ns_components
+      title: Deploy optional components
+      items:
+        - name: enable_optional_ns
+          title: Enable optional components in alternate namespace
+          type: bool
+          default: '0'
+        - name: optional_ns
+          title: The name of the optional namespace
+          type: text
+          default: "remote"
+          when: repl{{ ConfigOptionEquals "enable_optional_ns" "1" }}
