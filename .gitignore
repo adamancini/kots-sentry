@@ -3,3 +3,4 @@ built/
 deps/
 *.swp
 .envrc
+.vscode
