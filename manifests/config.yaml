@@ -6,7 +6,7 @@ spec:
   groups:
     - name: sentry
       title: Sentry
-      description: Sentry Defaults
+      description: Sentry Default Configs
       items:
         - name: admin_username
           title: Admin Username
@@ -16,11 +16,11 @@ spec:
           title: Admin Password
           type: password
           default: 'password'
-        - name: secret_key
-          title: Secret Key
-          type: password
-          hidden: true
-          value: "{{repl RandomString 40}}"
+        # - name: secret_key
+        #   title: Secret Key
+        #   type: password
+        #   hidden: true
+        #   value: "{{repl RandomString 40}}"
         - name: worker_replicas
           title: Worker Replicas
           type: text
@@ -130,3 +130,55 @@ spec:
           type: password
           default: 'password'
           when: repl{{ ConfigOptionEquals "enable_smtp" "1" }}
+    - name: node_affinity
+      title: Node Affinity Configuration
+      description: |
+        Torch Node Affinity Configuration
+      items:
+        - name: enable_node_affinity
+          title: Enable Node Affinity
+          type: bool
+          default: "0"
+        - name: node_affinity
+          title: Node Affinity Config
+          type: textarea
+          props:
+            rows: 15
+          when: repl{{ ConfigOptionEquals "enable_node_affinity" "1" }}
+          required: false
+        - name: enable_node_toleration
+          title: Enable Node Toleration
+          type: bool
+          default: "0"
+        - name: node_toleration
+          title: Node Toleration Config
+          type: textarea
+          props:
+            rows: 15
+          when: repl{{ ConfigOptionEquals "enable_node_toleration" "1" }}
+          required: false
+    - name: certs
+      items:
+        - name: issuer_certs
+          type: textarea
+          value: repl{{$ca := genCA "ingress-ca" 365}}repl{{cat ($ca.Cert | b64enc) ($ca.Key | b64enc)}}
+          hidden: true
+        - name: issuer_cert
+          type: textarea
+          title: Issuer CA certificate
+          help_text: |
+            A self-signed CA has been automatically generated. Replace this with an intermediate CA
+            certificate to tie TLS into your trust infrastructure.
+          default: repl{{(split " " (ConfigOption "issuer_certs"))._0 | b64dec}}
+    - name: optional_ns_components
+      title: Deploy optional components
+      items:
+        - name: enable_optional_ns
+          title: Enable optional components in alternate namespace
+          type: bool
+          default: '0'
+        - name: optional_ns
+          title: The name of the optional namespace
+          type: text
+          default: "remote"
+          when: repl{{ ConfigOptionEquals "enable_optional_ns" "1" }}

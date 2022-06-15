@@ -62,7 +62,7 @@ spec:
           - fail:
               when: "== microk8s"
               message: The application does not support Microk8s Clusters
-          - fail:
+          - pass:
               when: "== minikube"
               message: The application does not support Minikube Clusters
           - pass:

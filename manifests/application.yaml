@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-     app.kubernetes.io/name: "sentry"
+      app.kubernetes.io/name: "sentry"
   componentKinds: []
   descriptor:
     version: "9.1.1"
@@ -20,3 +20,5 @@ spec:
     links:
       - description: Open Sentry Enterprise
         url: "http://sentry"
+  additionalNamespaces:
+    - '*'

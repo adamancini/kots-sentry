@@ -13,14 +13,22 @@ spec:
         name: sentry/logs
         selector:
           - component=sentry
+    - exec:
+        name: get-app-versions
+        selector:
+          app=kotsadm
+        namespace: '{{repl Namespace}}'
+        command: ["/kots"]
+        args: ["get", "versions", "-n", '{{repl Namespace}}', "sentry-pro", "-o", "json"]
     - run:
-        collectorName: ping-google
+        name: ping-google
+        namespace: '{{repl Namespace}}'
         image: flungo/netutils
         command: ["ping"]
         args: ["www.google.com"]
         timeout: 5s
     - http:
-        collectorName: echo-ip
+        name: echo-ip
         get:
           url: https://api.replicated.com/market/v1/echo/ip
   analyzers:
