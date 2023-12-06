@@ -1,8 +1,10 @@
+---
 apiVersion: troubleshoot.sh/v1beta2
 kind: SupportBundle
 metadata:
   name: sentry-enterprise
 spec:
+  uri: https://raw.githubusercontent.com/adamancini/kots-sentry/main/manifests/support-bundle.yaml
   collectors:
     - secret:
         name: myapp-postgres
@@ -13,16 +15,28 @@ spec:
         name: sentry/logs
         selector:
           - component=sentry
+        limits:
+          maxAge: 6000h
+          # maxLines: 10000
     - exec:
         name: get-app-versions
         selector:
-          app=kotsadm
-        namespace: '{{repl Namespace}}'
+          - app=kotsadm
+        namespace: "{{repl Namespace}}"
         command: ["/kots"]
-        args: ["get", "versions", "-n", '{{repl Namespace}}', "sentry-pro", "-o", "json"]
+        args:
+          [
+            "get",
+            "versions",
+            "-n",
+            "{{repl Namespace}}",
+            "sentry-pro",
+            "-o",
+            "json",
+          ]
     - run:
         name: ping-google
-        namespace: '{{repl Namespace}}'
+        namespace: "{{repl Namespace}}"
         image: flungo/netutils
         command: ["ping"]
         args: ["www.google.com"]
@@ -31,6 +45,11 @@ spec:
         name: echo-ip
         get:
           url: https://api.replicated.com/market/v1/echo/ip
+    - http:
+        name: internal
+        get:
+          url: http://sentry
+    - http:
   analyzers:
     - imagePullSecret:
         checkName: Access to index.docker.io
@@ -42,7 +61,7 @@ spec:
               message: Found credentials to pull private images from index.docker.io
     - ingress:
         ingressName: sentry-ingress
-        namespace: '{{repl Namespace}}'
+        namespace: "{{repl Namespace}}"
         outcomes:
           - fail:
               message: Sentry ingress is missing or not ready.
@@ -50,7 +69,7 @@ spec:
               message: Sentry ingress is ready.
     - deploymentStatus:
         name: sentry-worker
-        namespace: '{{repl Namespace}}'
+        namespace: "{{repl Namespace}}"
         outcomes:
           - fail:
               when: "< 1"
@@ -62,7 +81,7 @@ spec:
               message: There are multiple replicas of the Sentry Worker deployment ready.
     - statefulsetStatus:
         name: sentry-redis-master
-        namespace: '{{repl Namespace}}'
+        namespace: "{{repl Namespace}}"
         outcomes:
           - fail:
               when: "< 1"

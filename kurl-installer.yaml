@@ -3,6 +3,39 @@ kind: Installer
 metadata:
   name: "sentry"
 spec:
+  kurl:
+    hostPreflights:
+      apiVersion: troubleshoot.sh/v1beta2
+      kind: HostPreflight
+      spec:
+        collectors:
+          - cpu: {}
+          - http:
+              collectorName: Can Access A Website
+              get:
+                url: https://myFavoriteWebsite.com
+        analyzers:
+          - cpu:
+              checkName: Number of CPU check
+              outcomes:
+                - fail:
+                    when: "count < 4"
+                    message: This server has less than 4 CPU cores
+                - warn:
+                    when: "count < 6"
+                    message: This server has less than 6 CPU cores
+                - pass:
+                    message: This server has at least 6 CPU cores
+          - http:
+              checkName: Can Access A Website
+              collectorName: Can Access A Website
+              outcomes:
+                - warn:
+                    when: "error"
+                    message: Error connecting to https://myFavoriteWebsite.com
+                - pass:
+                    when: "statusCode == 200"
+                    message: Connected to https://myFavoriteWebsite.com
   contour:
     version: latest
   containerd:

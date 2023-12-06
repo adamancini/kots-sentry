@@ -5,6 +5,8 @@ metadata:
   labels:
     app: sentry
 data:
+  encryption-key: |-
+    repl{{ ConfigOption "encryption_key" | YamlEscape }}
   config.yml: |-
     # While a lot of configuration in Sentry can be changed via the UI, for all
     # new-style config (as of 8.0) you can also declare values here in this file

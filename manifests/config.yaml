@@ -16,16 +16,20 @@ spec:
           title: Admin Password
           type: password
           default: 'password'
-        # - name: secret_key
-        #   title: Secret Key
-        #   type: password
-        #   hidden: true
-        #   value: "{{repl RandomString 40}}"
+        - name: secret_key
+          title: Secret Key
+          type: password
+          hidden: true
+          value: "{{repl RandomString 40}}"
         - name: worker_replicas
           title: Worker Replicas
           type: text
           default: "2"
           required: true
+        - name: encryption_key
+          title: encryption Key
+          type: text
+          default: "foobar"
     - name: database
       title: Database
       description: Database Options

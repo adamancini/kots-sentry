@@ -3,7 +3,48 @@ kind: Preflight
 metadata:
   name: sentry-enterprise
 spec:
+  collectors:
+    - data:
+        name: versions/kots.txt
+        data: "{{repl KotsVersion}}"
+    - data:
+        name: versions/velero.txt
+        data: '{{repl KurlString "Velero.Version"}}'
+    - data:
+        name: versions/contour.txt
+        data: '{{repl KurlString "Contour.Version"}}'
+    - data:
+        name: versions/weave.txt
+        data: '{{repl KurlString "Weave.Version"}}'
+    - postgres:
+        collectorName: postgresql
+        uri: postgresql://sentry:repl{{ConfigOption "embedded_postgres_password"}}@postgres:5432/postgres?sslmode=disable
+        # uri: repl{{if ConfigOptionEquals "postgres_type" "external_postgres_inline"}}repl{{ConfigOption "external_postgres_host"}}/postgres?sslmode=requirerepl{{else}}postgresql://repl{{ConfigOption "external_postgres_user"}}:repl{{ConfigOption "external_postgres_password"}}@postgres.repl{{Namespace | ToLower}}.svc.cluster.local/postgres?sslmode=disablerepl{{end}}
   analyzers:
+    - textAnalyze:
+        exclude: "repl{{ (not IsKurl) }}"
+        checkName: Velero Version
+        fileName: versions/velero.txt
+        # The KOTS data collectors erroneously inject some whitespace so the (?m) at the start is necessary until they fix that
+        # This regex checks if the Velero version is 1.9.0+ but not a larger major or minor version.
+        regex: '(?m)^(1)\.(9)\.([0-9]+|\d{2,})$'
+        outcomes:
+          - fail:
+              message: Velero version ({{repl KurlString "Velero.Version"}}) is incompatible with this release. Please see the release notes about upgrading.
+          - pass:
+              message: Velero version ({{repl KurlString "Velero.Version"}}) is compatible with this release.
+    - textAnalyze:
+        exclude: 'repl{{ or (not IsKurl) (ConfigOptionEquals "use_included_ingress" "0") }}'
+        checkName: Contour Version
+        fileName: versions/contour.txt
+        # The KOTS data collectors erroneously inject some whitespace so the (?m) at the start is necessary until they fix that
+        # This regex checks if the patch version is greater than or equal to 1.22.0.
+        regex: '(?m)^(1)\.(22)\.([0-9]+|\d{2,})$'
+        outcomes:
+          - fail:
+              message: Contour version ({{repl KurlString "Contour.Version"}}) is incompatible with this release. Please see the release notes about upgrading.
+          - pass:
+              message: Contour version ({{repl KurlString "Contour.Version"}}) is compatible with this release.
     - nodeResources:
         checkName: Cluster Node Count
         outcomes:
@@ -112,9 +153,9 @@ spec:
         storageClassName: "default"
         outcomes:
           - fail:
-              message: Could not find a storage class called default
+              message: Could not find a storage class named 'default'
           - pass:
-              message: Default storage class found
+              message: Found a storage class named 'default'
     - customResourceDefinition:
         customResourceDefinitionName: ingressroutes.contour.heptio.com
         checkName: IngressRoute CRD
@@ -132,24 +173,25 @@ spec:
           - pass:
               message: Found credentials to pull private images from index.docker.io
     - postgres:
-        checkName: Future versions of StackBlitz EE will require PostgreSQL version 13 or greater.
+        checkName: Future versions of Sentry Enterprise will require PostgreSQL version 13 or greater.
         collectorName: postgresql
         outcomes:
           - fail:
               when: connected == false
-              message: Cannot connect to PostgreSQL server. If you are installing for the first time this is normal.
+              message: Cannot connect to PostgreSQL server. If you are installing for the first time this is normal.  If this is an upgrade, check that the pod is running and responding to DNS.
           - warn:
               when: version < 13.x
               message: >-
                 {{repl if ConfigOptionEquals "postgres_type" "external_postgres_inline"}}
-                  To prepare for the coming release of StackBlitz EE 2.0, Please upgrade your PostgreSQL instance ASAP.
+                  To prepare for the coming release of Sentry Enterprise 2.0, Please upgrade your PostgreSQL instance ASAP.
                 {{repl else}}
                   This release uses a new embedded postgres 13 instance. Your data will be migrated to it automatically. Please allow several minutes after deployment for the migration to complete.
                 {{repl end}}
           - pass:
               message: Your Postgres server is already compliant.
-  collectors:
-    - postgres:
-        collectorName: postgresql
-        uri: postgresql://postgres:repl{{ConfigOption "embedded_postgres_password"}}@postgres:5432/postgres?sslmode=disable
-        #uri: repl{{if ConfigOptionEquals "postgres_type" "external_postgres_inline"}}repl{{ConfigOption "external_postgres_connectionstring"}}/postgres?sslmode=requirerepl{{else}}postgresql://postgres:postgres@postgres.repl{{Namespace | ToLower}}.svc.cluster.local/postgres?sslmode=disablerepl{{end}}
+    - storageClass: #Check if the annotation `storageclass.kubernetes.io/is-default-class` is present
+        outcomes:
+          - fail:
+              message: No default storage class found.
+          - pass:
+              message: A default storage class exists
