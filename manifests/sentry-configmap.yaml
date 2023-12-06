@@ -5,8 +5,7 @@ metadata:
   labels:
     app: sentry
 data:
-  encryption-key: |-
-    repl{{ ConfigOption "encryption_key" | YamlEscape }}
+  encryption-key: repl{{ConfigOption "encryption_key" | printf "%q"}}
   config.yml: |-
     # While a lot of configuration in Sentry can be changed via the UI, for all
     # new-style config (as of 8.0) you can also declare values here in this file
@@ -65,9 +64,6 @@ data:
     filestore.backend: 'filesystem'
     filestore.options:
       location: '/var/lib/sentry/files'
-
-
-
 
   sentry.conf.py: |-
     # This file is just Python, with a touch of Django which means
@@ -364,4 +360,3 @@ data:
     if 'BITBUCKET_CONSUMER_KEY' in os.environ:
         BITBUCKET_CONSUMER_KEY = env('BITBUCKET_CONSUMER_KEY')
         BITBUCKET_CONSUMER_SECRET = env('BITBUCKET_CONSUMER_SECRET')
-
